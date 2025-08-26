@@ -1,4 +1,6 @@
-import { Button, Flex } from "@radix-ui/themes";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input";
+import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 
 type RegisterForm = {
@@ -23,9 +25,9 @@ const Register = () => {
       <h2>Register</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* User Name */}
-        <div>
-          <label htmlFor="userName">UserName </label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-3">
+          <Label htmlFor="userName">UserName </Label>
+          <Input
             type="text"
             {...register("userName", {
               required: "UserName is Required",
@@ -34,9 +36,9 @@ const Register = () => {
           {errors.userName && <p>{errors.userName.message}</p>}
         </div>
         {/* Email */}
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-3">
+          <Label htmlFor="email">Email</Label>
+          <Input
             type="email"
             {...register("email", {
               required: "Email is Required",
@@ -50,9 +52,9 @@ const Register = () => {
         </div>
         {/* Password */}
 
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
+        <div className="grid w-full max-w-sm items-center gap-3">
+          <Label htmlFor="password">Password</Label>
+          <Input
             type="text"
             {...register("password", {
               required: "Password is Required",
@@ -67,9 +69,9 @@ const Register = () => {
 
         {/* Phone Number */}
 
-        <div>
-          <label htmlFor="phoneNumber">Phone Number</label>
-          <input
+        <div >
+          <Label htmlFor="phoneNumber">Phone Number</Label>
+          <Input
             type="tel"
             {...register("phoneNumber", {
               required: "Phone Number is required",
@@ -82,11 +84,12 @@ const Register = () => {
           {errors.phoneNumber && <p>{errors.phoneNumber.message}</p>}
         </div>
 
-        <Flex>
-          <Button type="submit" variant="solid" color="blue">
+        
+          <Button type="submit" variant="destructive">
             Register
           </Button>
-        </Flex>
+          
+        
       </form>
     </div>
   );
