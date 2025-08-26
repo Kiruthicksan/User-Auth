@@ -1,6 +1,10 @@
+import Register from "./pages/Register"
+
 const App = () => {
   return (
-    <div>App</div>
+    <div>
+      <Register />
+    </div>
   )
 }
 export default App
