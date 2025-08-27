@@ -24,7 +24,17 @@ const userSchema = new mongoose.Schema({
         required: [true, "Password is required"],
         min: [6, "Password must be at least 6 characters long"]
     },
-},{ timestamps: true });
+    phoneNumber: {
+        type: String,
+        minlength: [10, "Phone number must be at least 10 characters long"],
+        match: [/^\d{10}$/, "Please enter a valid phone number"]
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin", "seller"],
+        default: "user"
+    }
+}, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 export default User;
