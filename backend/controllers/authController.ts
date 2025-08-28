@@ -7,7 +7,7 @@ const jwtSecret = process.env.JWT_SECRET_KEY;
 
 export const RegisterUser = async (req: Request, res: Response) => {
   try {
-    const { userName, email, password, phoneNumber } = req.body;
+    const { userName, email, password, phoneNumber , role} = req.body;
 
     //  Check if user already exists
 
@@ -28,6 +28,8 @@ export const RegisterUser = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       phoneNumber,
+      role
+      
     });
 
     await newuser.save();
