@@ -1,25 +1,55 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate} from "react-router-dom";
 
 type RegisterForm = {
   userName: string;
   email: string;
   password: string;
   phoneNumber: string;
+  role: "user" | "admin";
 };
 
+
+
 const Register = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset
   } = useForm<RegisterForm>();
 
+const [message, setMessage] = useState<string | null>(null);
+
   const onSubmit = async (data: RegisterForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Form Data", data);
+
+    console.log(data)
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/register", data);
+      const token = response.data.token
+      localStorage.setItem('token', token)
+      
+      setMessage(response.data.message || "Registration successful!");
+      navigate('/')
+      reset();
+    } catch (error : unknown) {
+       if (axios.isAxiosError(error)) {
+         setMessage(error.response?.data.message || "Registration failed");
+       } else if (error instanceof Error) {
+         setMessage(error.message);
+       } else {
+         setMessage("An unexpected error occurred");
+       }
+    }
   };
+
+
+  
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4 relative">
@@ -49,6 +79,17 @@ const Register = () => {
                 />
               </svg>
             </div>
+            {message && (
+              <p
+                className={`mb-4 text-sm font-medium ${
+                  message.toLowerCase().includes("success")
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {message}
+              </p>
+            )}
             <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
               Create Account
             </h2>
@@ -185,6 +226,38 @@ const Register = () => {
                   {errors.phoneNumber.message}
                 </p>
               )}
+              {/* Role Select Field */}
+              <div className="group mt-4">
+                <label
+                  htmlFor="role"
+                  className="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600"
+                >
+                  Role
+                </label>
+                <div className="relative">
+                  <select
+                    id="role"
+                    className={`w-full px-4 py-3 bg-gray-50/50 border-2 rounded-xl transition-all duration-300 outline-none ${
+                      errors.role
+                        ? "border-red-300 focus:border-red-500 bg-red-50/50"
+                        : "border-gray-200 focus:border-purple-500 focus:bg-white/80"
+                    } hover:border-gray-300 focus:shadow-lg focus:scale-[1.02]`}
+                    {...register("role", { required: "Role is required" })}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Select a role
+                    </option>
+                    <option value="user">User</option>
+                    <option value="admin">Seller</option>
+                  </select>
+                </div>
+                {errors.role && (
+                  <p className="text-red-500 text-sm mt-2 animate-pulse flex items-center">
+                    {errors.role.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Submit Button */}

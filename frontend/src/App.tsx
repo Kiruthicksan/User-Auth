@@ -1,3 +1,5 @@
+import ProtectedRoute from "./components/ProtectedRoute"
+import Dashboard from "./pages/Dashboard"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
@@ -8,6 +10,7 @@ const App = () => {
     <BrowserRouter>
     <Routes>
       <Route path="/" element = {<Home />}></Route>
+      <Route path = "/dashboard" element = {<ProtectedRoute><Dashboard /></ProtectedRoute>}></Route>
       <Route path="/register" element = {<Register />}></Route>
       <Route path="/login" element = {<Login />}></Route>
     </Routes>

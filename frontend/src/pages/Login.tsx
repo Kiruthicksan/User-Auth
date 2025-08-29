@@ -1,5 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import axios from "axios"; 
+import { useNavigate } from "react-router-dom";
+
 
 type LoginForm = {
   email: string;
@@ -7,16 +10,37 @@ type LoginForm = {
 };
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<LoginForm>();
 
+  const [message, setMessage] = useState<string | null>(null);
+
   const onSubmit = async (data: LoginForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log(data);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        data
+      );
+      const token = response.data.token
+      localStorage.setItem('token', token)
+      setMessage(response.data.message || "Login successful!");
+      navigate('/')
+      reset();
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        setMessage(error.response?.data.message || "Login failed");
+      } else if (error instanceof Error) {
+        setMessage(error.message);
+      } else {
+        setMessage("An unexpected error occurred");
+      }
+    }
   };
 
   return (
@@ -47,6 +71,17 @@ const Login = () => {
                 />
               </svg>
             </div>
+            {message && (
+              <div
+                className={`mb-4 px-4 py-2 rounded-xl text-sm font-medium ${
+                  message.toLowerCase().includes("success")
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {message}
+              </div>
+            )}
             <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h2>
@@ -105,35 +140,48 @@ const Login = () => {
                 } hover:border-gray-300 focus:shadow-lg focus:scale-[1.02]`}
                 {...register("password", {
                   required: "Password is required",
-                  minLength: { value: 6, message: "Password must be at least 6 characters" },
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters",
+                  },
                 })}
               />
-            <button
+              <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-3/4 -translate-y-1/2 flex items-center text-gray-400 hover:text-indigo-500 transition-colors"
                 tabIndex={-1}
-            >
+              >
                 {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7s4-7 9-7c1.657 0 3.216.41 4.5 1.125M15 12a3 3 0 11-6 0 3 3 0 016 0zm6.061 4.061A9.969 9.969 0 0021 12c0-3-4-7-9-7-.795 0-1.568.074-2.313.213M3 3l18 18"
-                        />
-                    </svg>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7s4-7 9-7c1.657 0 3.216.41 4.5 1.125M15 12a3 3 0 11-6 0 3 3 0 016 0zm6.061 4.061A9.969 9.969 0 0021 12c0-3-4-7-9-7-.795 0-1.568.074-2.313.213M3 3l18 18"
+                    />
+                  </svg>
                 ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3-4 7-9 7s-9-4-9-7 4-7 9-7 9 4 9 7z"
-                        />
-                    </svg>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 3-4 7-9 7s-9-4-9-7 4-7 9-7 9 4 9 7z"
+                    />
+                  </svg>
                 )}
-            </button>
+              </button>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-2 animate-pulse">
                   {errors.password.message}
@@ -168,15 +216,15 @@ const Login = () => {
             </button>
 
             <div className="text-center">
-                <span className="text-gray-600 text-sm">
-                    Don't have an account?{" "}
-                    <a
-                        href="/register"
-                        className="text-indigo-600 hover:text-indigo-800 hover:underline transition-colors font-semibold"
-                    >
-                        Register
-                    </a>
-                </span>
+              <span className="text-gray-600 text-sm">
+                Don't have an account?{" "}
+                <a
+                  href="/register"
+                  className="text-indigo-600 hover:text-indigo-800 hover:underline transition-colors font-semibold"
+                >
+                  Register
+                </a>
+              </span>
             </div>
 
             {/* Social Login */}
@@ -185,7 +233,9 @@ const Login = () => {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
