@@ -27,7 +27,6 @@ const [message, setMessage] = useState<string | null>(null);
 
   const onSubmit = async (data: RegisterForm) => {
 
-    console.log(data)
     try {
       const response = await axios.post("http://localhost:8000/api/auth/register", data);
       const token = response.data.token
@@ -249,7 +248,7 @@ const [message, setMessage] = useState<string | null>(null);
                       Select a role
                     </option>
                     <option value="user">User</option>
-                    <option value="admin">Seller</option>
+                    <option value="admin">Admin</option>
                   </select>
                 </div>
                 {errors.role && (
